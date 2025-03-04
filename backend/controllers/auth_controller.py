@@ -43,6 +43,7 @@ def login():
         "exp": datetime.utcnow() + timedelta(hours=1)  # Expiry in 1 hour
     }
     token = jwt.encode({'alg': 'HS256'}, payload, app.config['SECRET_KEY'])
+    token = token.decode('utf-8')
 
 
     return jsonify({"message": "Login successful", "access_token": token}), 200

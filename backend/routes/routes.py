@@ -23,7 +23,7 @@ def initialize_routes(app):
     # def logout_route():
     #     return logout()
 
-    # @app.route('/protected', methods=['GET'])
-    # @token_required
-    # def protected_route():
-    #     return jsonify({"message": "This is a protected route", "user": request.user}), 200
+    @app.route('/protected', methods=['GET'])
+    @token_required
+    def protected_route():
+        return jsonify({"message": "This is a protected route", "user": request.user}), 200
