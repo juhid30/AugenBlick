@@ -2,8 +2,8 @@ from datetime import datetime
 from config import mongo
 
 class Attendance:
-    def __init__(self, user_id, date, status, check_in_time, check_out_time, work_hours):
-        self.user_id = user_id
+    def __init__(self, user_email, date, status, check_in_time, check_out_time, work_hours):
+        self.user_email = user_email
         self.date = date
         self.status = status
         self.check_in_time = check_in_time
@@ -12,18 +12,18 @@ class Attendance:
         self.collection = mongo.db.attendance
 
     @staticmethod
-    def get_attendance_by_user_and_date(user_id, date):
-        """ Fetch attendance by user_id and date """
-        attendance = mongo.db.attendance.find_one({"user_id": user_id, "date": date})
+    def get_attendance_by_user_and_date(user_email, date):
+        """ Fetch attendance by user_email and date """
+        attendance = mongo.db.attendance.find_one({"user_email": user_email, "date": date})
         if attendance:
             attendance["_id"] = str(attendance["_id"])  # Convert ObjectId to string
         return attendance
 
     @staticmethod
-    def add_attendance(user_id, date, status, check_in_time, check_out_time, work_hours):
+    def add_attendance(user_email, date, status, check_in_time, check_out_time, work_hours):
         """ Add attendance record """
         attendance = {
-            "user_id": user_id,
+            "user_email": user_email,
             "date": date,
             "status": status,
             "check_in_time": check_in_time,
@@ -35,7 +35,7 @@ class Attendance:
         return attendance
 
     @staticmethod
-    def update_attendance(user_id, date, status=None, check_in_time=None, check_out_time=None, work_hours=None):
+    def update_attendance(user_email, date, status=None, check_in_time=None, check_out_time=None, work_hours=None):
         """ Update attendance record """
         update_fields = {}
         if status is not None:
@@ -47,11 +47,11 @@ class Attendance:
         if work_hours is not None:
             update_fields["work_hours"] = work_hours
 
-        response = mongo.db.attendance.update_one({"user_id": user_id, "date": date}, {"$set": update_fields})
+        response = mongo.db.attendance.update_one({"user_email": user_email, "date": date}, {"$set": update_fields})
         return response
 
     @staticmethod
-    def delete_attendance(user_id, date):
+    def delete_attendance(user_email, date):
         """ Delete attendance record """
-        response = mongo.db.attendance.delete_one({"user_id": user_id, "date": date})
+        response = mongo.db.attendance.delete_one({"user_email": user_email, "date": date})
         return response
