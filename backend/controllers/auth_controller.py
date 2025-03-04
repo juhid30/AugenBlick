@@ -22,7 +22,7 @@ def register():
 
         hashed_password = generate_password_hash(data["password"])
         
-        user_response = User.add_user(data["email"], hashed_password, data.get("name", ""))
+        user_response = User.add_user(data["email"], hashed_password, data.get("name", ""), data.get("role", ""), data.get("team", ""), data.get("manager_id", ""))
 
         return jsonify({"message": "User registered successfully", "user_id": user_response}), 201
     except Exception as e:
@@ -53,6 +53,8 @@ def login():
         payload = {
             "user_id": user['_id'],
             "email": user['email'],
+            "role": user['role'],
+            "manager_id": user.get('manager_id', ""),
             "exp": datetime.utcnow() + timedelta(hours=1)  # Expiry in 1 hour
         }
         token = jwt.encode({'alg': 'HS256'}, payload, app.config['SECRET_KEY'])

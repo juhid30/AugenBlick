@@ -37,6 +37,7 @@ def extract_leave_details_gemini(text):
     prompt = f"""
     You are a document parser. The following text contains a leave request from an employee. Extract the relevant details such as:
     - Employee Name
+    - Employee Email
     - Leave Type
     - Leave Start Date
     - Leave End Date

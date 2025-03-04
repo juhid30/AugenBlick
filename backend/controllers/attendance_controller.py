@@ -31,7 +31,6 @@ def check_in():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
 def check_out():
     """ Update attendance record """
     try:
@@ -52,6 +51,66 @@ def check_out():
         status = "checked-out"
 
         update_result = Attendance.update_attendance(user_email, date, status=status, check_out_time=check_out_time, work_hours=work_hours)
+
+        if update_result.modified_count > 0:
+            return jsonify({"message": "Attendance updated successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to update attendance"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def checkin_face(email):
+    """ Add attendance record """
+    try:
+        app = current_app
+
+        user_email = email
+        date = datetime.now().strftime("%Y-%m-%d")
+        check_in_time = datetime.now().strftime("%H:%M:%S")
+
+        status = "checked-in"
+        check_out_time = ""
+        work_hours = 0
+        overtime = 0
+
+        attendance = Attendance.add_attendance(user_email, date, status, check_in_time, check_out_time, work_hours, overtime)
+
+        if attendance:
+            return jsonify({"message": "Attendance added successfully", "attendance": attendance}), 201
+        else:
+            return jsonify({"error": "Failed to add attendance"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+def checkout_face(email):
+    """ Update attendance record """
+    try:
+        app = current_app
+
+        user_email = email
+        date = datetime.now().strftime("%Y-%m-%d")
+        check_out_time = datetime.now().strftime("%H:%M:%S")
+        # Get check-in time from database for this user and date
+        attendance = Attendance.get_attendance(user_email, date)
+        if not attendance:
+            return jsonify({"error": "No check-in record found"}), 400
+            
+        check_in_time = datetime.strptime(attendance['check_in_time'], "%H:%M:%S")
+        check_out = datetime.strptime(check_out_time, "%H:%M:%S")
+        
+        # Calculate work hours as float
+        time_diff = check_out - check_in_time
+        work_hours = round(time_diff.total_seconds() / 3600, 2)
+
+        if work_hours > 8:
+            overtime = work_hours - 8
+        else:
+            overtime = 0
+
+        status = "checked-out"
+
+        update_result = Attendance.update_attendance(user_email, date, status=status, check_out_time=check_out_time, work_hours=work_hours, overtime=overtime)
 
         if update_result.modified_count > 0:
             return jsonify({"message": "Attendance updated successfully"}), 200

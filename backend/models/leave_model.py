@@ -53,3 +53,12 @@ class Leave:
         """ Reject a leave """
         response = mongo.db.leaves.update_one({"leave_id": leave_id}, {"$set": {"status": "rejected"}, "remarks": remark})
         return response
+    
+
+    @staticmethod
+    def get_leaves_by_email(user_email):
+        """ Fetch all leaves by user_email """
+        leaves = mongo.db.leaves.find({"user_email": user_email})
+        for leave in leaves:
+            leave["_id"] = str(leave["_id"])
+        return list(leaves)

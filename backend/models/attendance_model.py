@@ -2,13 +2,14 @@ from datetime import datetime
 from config import mongo
 
 class Attendance:
-    def __init__(self, user_email, date, status, check_in_time, check_out_time, work_hours):
+    def __init__(self, user_email, date, status, check_in_time, check_out_time, work_hours, overtime):
         self.user_email = user_email
         self.date = date
         self.status = status
         self.check_in_time = check_in_time
         self.check_out_time = check_out_time
         self.work_hours = work_hours
+        self.overtime = overtime
         self.collection = mongo.db.attendance
 
     @staticmethod
@@ -52,6 +53,13 @@ class Attendance:
 
     @staticmethod
     def delete_attendance(user_email, date):
+
         """ Delete attendance record """
         response = mongo.db.attendance.delete_one({"user_email": user_email, "date": date})
         return response
+    
+    @staticmethod
+    def get_attendance_by_user(user_email):
+        """ Fetch attendance by user_email """
+        attendance = mongo.db.attendance.find({"user_email": user_email})
+        return list(attendance)
