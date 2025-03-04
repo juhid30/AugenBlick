@@ -1,19 +1,29 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_pymongo import PyMongo
-from routes.routes import initialize_routes
-import datetime
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-app = Flask(__name__)
+def create_app():
+    """Create and configure the Flask app."""
+    app = Flask(__name__)
 
-# Secret key for encoding and decoding JWT
-app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a secure key in production
-app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'  # Cookie name for the JWT
+    # Configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['JWT_COOKIE_NAME'] = os.getenv('JWT_COOKIE_NAME')
+    app.config["MONGO_URI"] = os.getenv('MONGO_URI')
+    # Initialize MongoDB
+    mongo = PyMongo(app)
 
-# Initialize MongoDB
-mongo = PyMongo(app)
+    # Import routes AFTER app is created
+    from routes.routes import initialize_routes
+    initialize_routes(app)
 
-# Initialize Routes
-initialize_routes(app)
+    print("Flask App Initialized 🚀")  # Better logging
+
+    return app
+
+app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True)

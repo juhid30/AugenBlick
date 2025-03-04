@@ -1,6 +1,6 @@
 import jwt
 from flask import request, jsonify
-from app import app
+from flask import current_app as app
 
 def token_required(f):
     """Middleware to require a valid JWT token for access"""

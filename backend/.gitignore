@@ -1,0 +1,60 @@
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.local
+*.secret
+
+# Instance folder (Flask-specific, used for config and uploads)
+instance/
+config.py
+
+# Database files
+*.sqlite3
+*.db
+*.sqlite
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs and debug files
+*.log
+*.out
+logs/
+
+# Pytest and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Mypy
+.mypy_cache/
+
+# PEP 582 (used by PDM)
+__pypackages__/
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
