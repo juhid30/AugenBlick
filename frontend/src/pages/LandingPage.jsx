@@ -7,7 +7,7 @@ import Services from "../components/Services";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import LoadingSpinner from "../components/LoadingSpinner";
-import Sidebar from "../components/Sidebar";
+// import Sidebar from "../components/Sidebar";
 
 const LandingPage = () => {
   const [loading, setLoading] = React.useState(true);
@@ -52,11 +52,11 @@ const LandingPage = () => {
     >
       <Navbar />
       <Hero />
-      <Sidebar
+      {/* <Sidebar
         isOpen={true}
         onClose={() => console.log("HElloe")}
         user={{ role: "student" }}
-      />
+      /> */}
       <About />
       <Services />
       <Contact />
