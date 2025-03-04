@@ -1,9 +1,8 @@
 from datetime import datetime
-from werkzeug.security import check_password_hash
 from config import mongo  
 
 class Leave:
-    def __init__(self, user_id, leave_id, leave_type, reason, start_date, end_date, status, pdf_uploaded, manager_id):
+    def __init__(self, user_id, leave_id, leave_type, reason, start_date, end_date, status, pdf_uploaded, manager_id, remarks):
         self.user_id = user_id
         self.leave_id = leave_id
         self.leave_type = leave_type
@@ -13,6 +12,7 @@ class Leave:
         self.status = status
         self.pdf_uploaded = pdf_uploaded
         self.manager_id = manager_id
+        self.remarks = remarks
         self.collection = mongo.db.users
 
     @staticmethod
@@ -49,7 +49,7 @@ class Leave:
         return response
     
     @staticmethod
-    def reject_leave(leave_id):
+    def reject_leave(leave_id, remark):
         """ Reject a leave """
-        response = mongo.db.leaves.update_one({"leave_id": leave_id}, {"$set": {"status": "rejected"}})
+        response = mongo.db.leaves.update_one({"leave_id": leave_id}, {"$set": {"status": "rejected"}, "remarks": remark})
         return response

@@ -45,7 +45,8 @@ def reject_leave(user):
     data = request.json
 
     leave_id = data.get('leave_id')
-    response = Leave.reject_leave(leave_id)
+    remark = data.get('remark')
+    response = Leave.reject_leave(leave_id, remark)
 
     if response:    
         return jsonify({"message": "Leave rejected successfully"}), 200
