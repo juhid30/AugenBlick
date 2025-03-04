@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import AttendancePage from "./pages/AttendancePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import LeavePage from "./pages/LeavePage";
+import LeaveReviewPage from "./pages/LeaveReviewPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/att" element={<AttendancePage />} />
           <Route path="/leave" element={<LeavePage />} />
+          <Route path="/rev" element={<LeaveReviewPage />} />
           {/* <Route path="/unauth" element={<UnauthorizedPage />} /> */}
         </Routes>
       </AnimatePresence>
