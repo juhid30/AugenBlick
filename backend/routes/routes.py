@@ -2,7 +2,8 @@ from flask import jsonify, request
 
 def initialize_routes(app):
     from controllers.auth_controller import register, login  # Import register and login functions
-    from middlewares.auth_middleware import token_required  
+    from controllers.leave_controller import add_leave, approve_leave, reject_leave  # Import add_leave function
+    from middlewares.auth_middleware import token_required 
 
     # print("HI")
 
@@ -19,9 +20,22 @@ def initialize_routes(app):
     def login_route():
         return login()
 
-    # @app.route('/logout', methods=['POST'])
-    # def logout_route():
-    #     return logout()
+
+
+    @app.route('/add-leave', methods=['POST'])
+    @token_required
+    def add_leave_route():
+        return add_leave(request.user)
+    
+    @app.route('/approve-leave', methods=['POST'])
+    @token_required 
+    def approve_leave_route():
+        return approve_leave(request.user)
+    
+    @app.route('/reject-leave', methods=['POST'])
+    @token_required 
+    def reject_leave_route():
+        return reject_leave(request.user)
 
     @app.route('/protected', methods=['GET'])
     @token_required

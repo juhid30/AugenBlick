@@ -3,11 +3,12 @@ from werkzeug.security import check_password_hash
 from config import mongo  
 
 class User:
-    def __init__(self, user_id, fullname, email, password):
+    def __init__(self, user_id, fullname, email, password, manager_id):
         self.user_id = user_id
         self.fullname = fullname
         self.email = email
         self.password = password
+        self.manager_id = manager_id
         self.collection = mongo.db.users
 
     @staticmethod
