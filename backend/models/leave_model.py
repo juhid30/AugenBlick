@@ -26,7 +26,7 @@ class Leave:
 
 
     @staticmethod
-    def add_leave_by_user(user_id, leave_type, reason, start_date, end_date, pdf_uploaded, manager_id):
+    def add_leave_by_user(user_id, leave_type, reason, start_date, end_date, pdf_uploaded, manager_id="abc"):
         """ Add a leave by user """
         leave = {
             "user_id": user_id,
@@ -62,3 +62,26 @@ class Leave:
         for leave in leaves:
             leave["_id"] = str(leave["_id"])
         return list(leaves)
+
+    @staticmethod
+    def get_leaves_by_manager_id(manager_id):
+        leaves = mongo.db.leaves.find({"manager_id": manager_id})
+        
+        # Convert leaves to a JSON-friendly format
+        leave_list = [
+            {
+                "_id": str(leave["_id"]),
+                "user_id": leave["user_id"],
+                "leave_type": leave["leave_type"],
+                "reason": leave["reason"],
+                "start_date": leave["start_date"],
+                "end_date": leave["end_date"],
+                "status": leave["status"],
+                "pdf_uploaded": leave.get("pdf_uploaded"),
+                "manager_id": leave["manager_id"],
+                "created_at": leave.get("created_at"),
+                "remarks": leave.get("remarks")
+            }
+            for leave in leaves
+        ]
+        return leave_list

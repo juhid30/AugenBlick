@@ -51,9 +51,9 @@ const LoginPage = () => {
 
       // Redirect based on role
       if (data.role === "user") {
-        window.location.href = "/emp-dash";
+        window.location.href = "/leave";
       } else if (data.role === "manager") {
-        window.location.href = "/man-dash";
+        window.location.href = "/rev";
       } else {
         throw new Error("Invalid role received");
       }

@@ -110,7 +110,6 @@ const LeavePage = () => {
       setShowFormOption(false);
     }
   };
-
   const handleDirectUpload = async (e) => {
     e.preventDefault();
 
@@ -122,26 +121,72 @@ const LeavePage = () => {
     setIsDirectUploading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const formData = new FormData();
+      formData.append("file", directUploadFile);
+
+      // Upload PDF to Flask Backend
+      const response = await fetch(
+        "http://127.0.0.1:5000/pdf/upload-leave-site-pdf",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to upload file to backend");
+
+      const data = await response.json();
+      console.log("Backend Upload Response:", data);
+
+      const pdfUrl = data.pdf_url; // ✅ Direct PDF link from backend
+
       toast.success("Leave application PDF uploaded successfully");
+      await submitLeaveRequest(leaveDetails, pdfUrl);
 
-      // Reset form after successful upload
-      setFormData({
-        startDate: "",
-        endDate: "",
-        leaveType: "annual",
-        reason: "",
-        file: null,
-      });
+      // ✅ Open PDF in a new tab
+      // window.open(pdfUrl, "_blank");
 
+      // Reset form
       setDirectUploadFile(null);
       document.getElementById("direct-file-upload").value = "";
       setUsingDirectUpload(false);
       setShowFormOption(true);
     } catch (error) {
+      console.error("Upload Error:", error);
       toast.error("Upload failed. Try again.");
     } finally {
       setIsDirectUploading(false);
+    }
+  };
+
+  const submitLeaveRequest = async (leaveDetails, pdfUrl = null) => {
+    try {
+      const token = localStorage.getItem("token"); // Get token from localStorage
+
+      const response = await fetch("http://127.0.0.1:5000/add-leave", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ Add Authorization header
+        },
+        body: JSON.stringify({
+          employee_name: leaveDetails["Employee Name"],
+          employee_email: leaveDetails["Employee Email"],
+          leave_type: leaveDetails["Leave Type"],
+          start_date: leaveDetails["Leave Start Date"],
+          end_date: leaveDetails["Leave End Date"],
+          reason: leaveDetails["Leave Reason"],
+          pdf_url: pdfUrl, // ✅ Attach PDF link if available
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to add leave request");
+
+      toast.success("Leave request added successfully!");
+      return true;
+    } catch (error) {
+      console.error("Leave Submission Error:", error);
+      toast.error("Failed to submit leave request.");
+      return false;
     }
   };
 
@@ -206,21 +251,39 @@ const LeavePage = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success("Leave application submitted successfully");
+      // Construct leave details
+      const leaveDetails = {
+        // "Employee Name": "John Doe", // Replace with actual user data
+        // "Employee Email": "john.doe@example.com", // Replace with actual email
+        "Leave Type": formData.leaveType,
+        "Leave Start Date": formData.startDate,
+        "Leave End Date": formData.endDate,
+        "Leave Reason": formData.reason,
+      };
+      console.log(leaveDetails);
 
-      setFormData({
-        startDate: "",
-        endDate: "",
-        leaveType: "annual",
-        reason: "",
-        file: null,
-      });
+      // ✅ Call reusable function to submit leave request
+      const success = await submitLeaveRequest(leaveDetails);
+      console.log(success);
+      if (success) {
+        toast.success("Leave application submitted successfully");
 
-      document.getElementById("file-upload").value = "";
-      setCurrentStep(1);
-      setFormTouched(false);
+        // Reset form
+        setFormData({
+          startDate: "",
+          endDate: "",
+          leaveType: "annual",
+          reason: "",
+          file: null,
+        });
+
+        document.getElementById("file-upload").value = "";
+        setCurrentStep(1);
+        setFormTouched(false);
+        console.log("BYEEE");
+      }
     } catch (error) {
+      console.error("Leave Submission Error:", error);
       toast.error("Submission failed. Try again.");
     } finally {
       setIsSubmitting(false);

@@ -1,12 +1,16 @@
-from flask import Flask, request, jsonify
+from flask import Flask,Blueprint, request, jsonify
 import fitz  # PyMuPDF
 import google.generativeai as genai
 import os
+import cloudinary.uploader
 import io
 import json
+from app import cloudinary
+
+pdf_parser_bp = Blueprint('pdf_parser', __name__)
 
 # Initialize Flask app
-app = Flask(__name__)
+# app = Flask(__name__)
 
 GEMINI_API_KEY = os.getenv("GEMINI_FOR_PDF")
 model_name = "gemini-1.5-pro"
@@ -64,25 +68,53 @@ def extract_leave_details_gemini(text):
     else:
         return {"error": "Failed to process the text with Gemini"}
 
-# Route to handle file upload and process the leave request
-@app.route('/upload-leave-request', methods=['POST'])
+
+@pdf_parser_bp.route('/upload-leave-site-pdf', methods=['POST'])
 def upload_leave_request():
-    # Check if the request contains a file
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
     pdf_file = request.files['file']
 
-    # Check if the file is a PDF
     if pdf_file and pdf_file.filename.endswith('.pdf'):
-        # Extract text from the PDF
-        pdf_text = extract_text_from_pdf(pdf_file)
+        try:
+            # Step 1: Save file temporarily
+            temp_pdf_path = f"temp/{pdf_file.filename}"
+            pdf_file.save(temp_pdf_path)
 
-        # Use Gemini to process the extracted text and extract leave details
-        leave_details = extract_leave_details_gemini(pdf_text)
-        return jsonify(leave_details), 200
-    else:
-        return jsonify({"error": "Invalid file format. Please upload a PDF."}), 400
+            # **Reset file pointer** for further use
+            pdf_file.seek(0)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+            # Step 2: Extract Text
+            pdf_text = extract_text_from_pdf(pdf_file)
+
+            # Step 3: Extract Leave Details
+            leave_details = extract_leave_details_gemini(pdf_text)
+
+            # Step 4: Upload to Cloudinary with Correct Resource Type
+            cloudinary_response = cloudinary.uploader.upload(
+                temp_pdf_path,
+                resource_type="raw",  # Keep as "raw"
+                format="pdf",  # Ensure the format remains PDF
+                use_filename=True,
+                unique_filename=False,
+                overwrite=True,
+                # raw_convert="aspose"  # ✅ Convert raw to actual PDF
+            )
+
+            # Step 5: Get Cloudinary URL for Direct Viewing
+            pdf_url = cloudinary_response["secure_url"]  # ✅ No need to modify URL manually
+
+            # Cleanup temp file
+            os.remove(temp_pdf_path)
+
+            return jsonify({
+                "leave_details": leave_details,
+                "pdf_url": pdf_url  # ✅ Now a viewable document link
+            })
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+# if __name__ == '__main__':
+#     app.run(debug=True)

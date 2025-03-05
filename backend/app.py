@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_cors import CORS  
 import os
+import cloudinary
+import cloudinary.uploader
 from dotenv import load_dotenv
 from config import mongo  # Import the mongo instance from config
 
@@ -13,11 +15,16 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config["MONGO_URI"] = os.getenv('MONGO_URI')
 
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 # Initialize MongoDB
 mongo.init_app(app)
 
-CORS(app, origins=["http://localhost:5173"])  # Allow requests from React frontend
-
+CORS(app, resources={r"/*": {"origins": os.getenv("CORS_ORIGIN", "*")}})
 
 # Import routes AFTER app is created
 from routes.routes import initialize_routes

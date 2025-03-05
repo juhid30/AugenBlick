@@ -18,3 +18,5 @@ def get_leave_details(user):
         return leave_details
     except Exception as e:
         raise Exception(str(e))
+    
+    
