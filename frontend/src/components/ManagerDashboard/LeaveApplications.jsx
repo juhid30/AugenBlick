@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { 
@@ -58,32 +58,39 @@ const RemarkModal = ({ onClose, onConfirm }) => {
 };
 
 const LeaveApplications = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [showRemarkModal, setShowRemarkModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
+  const [leaveData, setLeaveData] = useState([]);
 
-  // Mock data - replace with your actual data
-  const mockLeaveData = [
-    {
-      _id: "67c7bee7e5e1361788023ad2",
-      user_email: "test1@gmail.com",
-      leave_type: "Sick Leave",
-      reason: "Feeling unwell, need rest",
-      start_date: "2025-03-10",
-      end_date: "2025-03-12",
-      status: "pending",
-      pdf_uploaded: "https://example.com/leave_document.pdf",
-      manager_id: "mgr12345",
-      created_at: {
-        $date: "2025-03-05T08:33:03.201Z"
+  useEffect(() => {
+    const fetchLeaveData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Retrieve token
+
+        const response = await fetch("http://127.0.0.1:5000/get-leaves-manager", {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        
+        if (!response.ok) throw new Error("Failed to fetch leave data");
+        const data = await response.json();
+        setLeaveData(data);
+      } catch (error) {
+        console.error("Error fetching leave data:", error);
       }
-    }
-  ];
+    };
+
+    fetchLeaveData();
+  }, []);
 
   const handleApprove = (leave) => {
-    console.log('Approved leave:', leave);
-    // Add your approval logic here
+    console.log("Approved leave:", leave);
+    // Add approval logic
   };
 
   const handleReject = (leave) => {
@@ -92,8 +99,8 @@ const LeaveApplications = () => {
   };
 
   const handleRejectConfirm = (remark) => {
-    console.log('Rejected leave:', selectedLeave, 'with remark:', remark);
-    // Add your rejection logic here
+    console.log("Rejected leave:", selectedLeave, "with remark:", remark);
+    // Add rejection logic
     setShowRemarkModal(false);
     setSelectedLeave(null);
   };
@@ -104,15 +111,11 @@ const LeaveApplications = () => {
   };
 
   const handleViewPDF = (pdfUrl) => {
-    window.open(pdfUrl, '_blank');
+    window.open(pdfUrl, "_blank");
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -164,7 +167,7 @@ const LeaveApplications = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {mockLeaveData.map((leave) => (
+                {leaveData.map((leave) => (
                   <tr key={leave._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{leave.user_email}</div>
@@ -174,15 +177,19 @@ const LeaveApplications = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {format(new Date(leave.start_date), 'MMM dd')} - {format(new Date(leave.end_date), 'MMM dd, yyyy')}
+                        {format(new Date(leave.start_date), "MMM dd")} - {format(new Date(leave.end_date), "MMM dd, yyyy")}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        leave.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        leave.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          leave.status === "approved"
+                            ? "bg-green-100 text-green-800"
+                            : leave.status === "rejected"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
                         {leave.status}
                       </span>
                     </td>
@@ -197,7 +204,7 @@ const LeaveApplications = () => {
                       </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {leave.status === 'pending' && (
+                      {leave.status === "pending" && (
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleApprove(leave)}
@@ -225,12 +232,7 @@ const LeaveApplications = () => {
       </div>
 
       <AnimatePresence>
-        {showRemarkModal && (
-          <RemarkModal 
-            onClose={handleCloseModal}
-            onConfirm={handleRejectConfirm}
-          />
-        )}
+        {showRemarkModal && <RemarkModal onClose={handleCloseModal} onConfirm={handleRejectConfirm} />}
       </AnimatePresence>
     </motion.div>
   );
