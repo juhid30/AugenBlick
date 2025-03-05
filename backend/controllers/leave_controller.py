@@ -18,7 +18,7 @@ def add_leave(user):
         leave_type = data.get('leave_type')
         reason = data.get('reason')
         start_date = data.get('start_date')
-        end_date = data.get('end_date')
+        end_date = data.get('end_date') or "28-03-2025"
         pdf_uploaded = data.get('pdf_uploaded') or None
         manager_id = data.get('manager_id' , "abc")
 

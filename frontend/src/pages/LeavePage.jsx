@@ -24,6 +24,7 @@ const LeavePage = () => {
     reason: "",
     file: null,
   });
+  const [leaveDetails, setLeaveDetails] = useState({});
 
   const [fileError, setFileError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,7 +113,7 @@ const LeavePage = () => {
   };
   const handleDirectUpload = async (e) => {
     e.preventDefault();
-
+    console.log(leaveDetails);
     if (!directUploadFile) {
       toast.error("Please select a PDF file to upload.");
       return;
@@ -139,9 +140,9 @@ const LeavePage = () => {
       console.log("Backend Upload Response:", data);
 
       const pdfUrl = data.pdf_url; // ✅ Direct PDF link from backend
-
+      console.log(data.leave_details);
       toast.success("Leave application PDF uploaded successfully");
-      await submitLeaveRequest(leaveDetails, pdfUrl);
+      await submitLeaveRequest(data.leave_details, pdfUrl);
 
       // ✅ Open PDF in a new tab
       // window.open(pdfUrl, "_blank");
@@ -162,7 +163,7 @@ const LeavePage = () => {
   const submitLeaveRequest = async (leaveDetails, pdfUrl = null) => {
     try {
       const token = localStorage.getItem("token"); // Get token from localStorage
-
+      console.log(leaveDetails);
       const response = await fetch("http://127.0.0.1:5000/add-leave", {
         method: "POST",
         headers: {
@@ -253,8 +254,8 @@ const LeavePage = () => {
     try {
       // Construct leave details
       const leaveDetails = {
-        // "Employee Name": "John Doe", // Replace with actual user data
-        // "Employee Email": "john.doe@example.com", // Replace with actual email
+        "Employee Name": "Juhi", // Replace with actual user data
+        "Employee Email": "user@example.com", // Replace with actual email
         "Leave Type": formData.leaveType,
         "Leave Start Date": formData.startDate,
         "Leave End Date": formData.endDate,
@@ -277,7 +278,7 @@ const LeavePage = () => {
           file: null,
         });
 
-        if(document.getElementById("file-upload")){
+        if (document.getElementById("file-upload")) {
           document.getElementById("file-upload").value = "";
         }
         setCurrentStep(1);
