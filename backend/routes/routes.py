@@ -10,11 +10,11 @@ def initialize_routes(app):
     from controllers.leave_controller import add_leave, approve_leave, reject_leave, get_leaves_for_manager  # Import add_leave function
     from controllers.attendance_controller import check_in, check_out  # Import check_in function
     from middlewares.auth_middleware import token_required 
-    from controllers.user_controller import get_attendance_details, get_leave_details, get_user_by_email
-    from face_recog import face_recog_bp
+    from controllers.user_controller import get_attendance_details, get_leave_details, get_user_by_email, get_user_by_manager, get_leaves_by_manager
+    # from face_recog import face_recog_bp
     # from pdf_parser import pdf_parser_bp
     from app import cloudinary
-    app.register_blueprint(face_recog_bp, url_prefix='/face-recog')  # Face recognition routes
+    # app.register_blueprint(face_recog_bp, url_prefix='/face-recog')  # Face recognition routes
     try:
         from pdf_parser import pdf_parser_bp  
         app.register_blueprint(pdf_parser_bp, url_prefix='/pdf')  
@@ -44,6 +44,7 @@ def initialize_routes(app):
 
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+    
     @app.route("/", methods=["GET"])
     def home_route():
         print("HELLLLLLOOOO")
@@ -91,6 +92,16 @@ def initialize_routes(app):
     @token_required
     def get_attendance_route():
         return get_attendance_details(request.user)
+    
+    @app.route('/get-teams', methods=['GET'])
+    @token_required
+    def get_teams_route():
+        return get_user_by_manager(request.user)
+    
+    @app.route('/get-leaves-mananger', methods=['GET'])
+    @token_required
+    def get_leaves_manager():
+        return get_leaves_by_manager(request.user)
 
     @app.route('/get-leaves', methods=['GET'])
     @token_required

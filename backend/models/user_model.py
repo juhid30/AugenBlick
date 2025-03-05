@@ -53,3 +53,21 @@ class User:
         user_data = new_user
         user_data["_id"] = str(result.inserted_id)
         return user_data
+    
+    def get_user_by_manager(manager_id):
+        """ Fetch all users by manager_id """
+        try:
+            # Fetch all users with the given manager_id and convert to a list
+            users = list(mongo.db.users.find({"manager_id": manager_id}))
+            return users
+        except Exception as e:
+            raise Exception(f"An error occurred: {str(e)}")
+
+    def get_leaves_by_manager(manager_id):
+        """ Fetch all leaves by manager_id """
+        try:
+            # Fetch all leaves with the given manager_id and convert to a list
+            leaves = list(mongo.db.leaves.find({"manager_id": manager_id}))
+            return leaves
+        except Exception as e:
+            raise Exception(f"An error occurred: {str(e)}")
