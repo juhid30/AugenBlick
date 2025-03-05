@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUsers, FiSearch, FiFilter } from 'react-icons/fi';
 
@@ -6,14 +6,14 @@ const mockTeamData = [
   {
     id: 1,
     email: 'john.doe@example.com',
-    name: 'John Doe',
+    fullname: 'John Doe',
     role: 'user',
     team: 'team1'
   },
   {
     id: 2,
     email: 'jane.smith@example.com',
-    name: 'Jane Smith',
+    fullname: 'Jane Smith',
     role: 'user',
     team: 'team1'
   },
@@ -23,18 +23,78 @@ const mockTeamData = [
 const TeamView = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTeam, setFilterTeam] = useState('all');
+  const [teamData, setTeamData] = useState(mockTeamData); // Set the initial team data to mockTeamData
+  const [isLoading, setIsLoading] = useState(true); // For loading state
+  const [error, setError] = useState(null); // For error handling
 
   const maskEmail = (email) => {
     const [username, domain] = email.split('@');
     return `${username.charAt(0)}${username.slice(1).replace(/./g, '*')}@${domain}`;
   };
 
-  const filteredTeam = mockTeamData.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.team.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTeam = filterTeam === 'all' || member.team === filterTeam;
+  // Fetch the team data from API
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      const token = localStorage.getItem('token'); // Get token from localStorage
+
+      if (!token) {
+        console.error("No token found in localStorage");
+        setError("No token found in localStorage");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await fetch('http://127.0.0.1:5000/get-teams', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Pass the token as Bearer
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch team data');
+        }
+
+        const data = await response.json();
+        // Append the fetched team data to the mock data
+        setTeamData(prevData => [...prevData, ...data]);
+      } catch (err) {
+        console.error('Error fetching team data:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeamData(); // Call fetch team data when component mounts
+  }, []);
+
+  // Filter team data based on search and filter
+  const filteredTeam = teamData.filter((member) => {
+    // Ensure member.fullname and member.team exist before calling toLowerCase
+    const memberName = member.fullname && typeof member.fullname === 'string' ? member.fullname.toLowerCase() : '';
+    const memberTeam = member.team && typeof member.team === 'string' ? member.team.toLowerCase() : '';
+  
+    const matchesSearch =
+      memberName.includes(searchTerm.toLowerCase()) || memberTeam.includes(searchTerm.toLowerCase());
+  
+    const matchesTeam = filterTeam === 'all' || memberTeam === filterTeam.toLowerCase();
+  
+    console.log({
+      matchesSearch,
+      matchesTeam,
+      searchTerm,
+      filterTeam,
+      memberName,
+      memberTeam,
+    });
+  
     return matchesSearch && matchesTeam;
   });
+  
 
   return (
     <motion.div
@@ -79,6 +139,9 @@ const TeamView = () => {
             </div>
           </div>
 
+          {isLoading && <p>Loading...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -93,7 +156,7 @@ const TeamView = () => {
                 {filteredTeam.map((member) => (
                   <tr key={member.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                      <div className="text-sm font-medium text-gray-900">{member.fullname}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">{maskEmail(member.email)}</div>

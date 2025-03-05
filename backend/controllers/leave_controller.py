@@ -20,7 +20,7 @@ def add_leave(user):
         start_date = data.get('start_date')
         end_date = data.get('end_date')
         pdf_uploaded = data.get('pdf_uploaded') or None
-        # manager_id = data.get('manager_id')
+        manager_id = data.get('manager_id' , "abc")
 
         if not all([leave_type, reason, start_date, end_date]):
             return jsonify({"error": "Missing required fields"}), 400

@@ -277,7 +277,9 @@ const LeavePage = () => {
           file: null,
         });
 
-        document.getElementById("file-upload").value = "";
+        if(document.getElementById("file-upload")){
+          document.getElementById("file-upload").value = "";
+        }
         setCurrentStep(1);
         setFormTouched(false);
         console.log("BYEEE");
