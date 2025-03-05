@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS  
 import os
 from dotenv import load_dotenv
 from config import mongo  # Import the mongo instance from config
@@ -14,6 +15,9 @@ app.config["MONGO_URI"] = os.getenv('MONGO_URI')
 
 # Initialize MongoDB
 mongo.init_app(app)
+
+CORS(app, origins=["http://localhost:5173"])  # Allow requests from React frontend
+
 
 # Import routes AFTER app is created
 from routes.routes import initialize_routes

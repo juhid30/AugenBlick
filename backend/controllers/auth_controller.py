@@ -60,6 +60,6 @@ def login():
         token = jwt.encode({'alg': 'HS256'}, payload, app.config['SECRET_KEY'])
         token = token.decode('utf-8')
 
-        return jsonify({"message": "Login successful", "access_token": token}), 200
+        return jsonify({"message": "Login successful", "access_token": token, "role":user['role']}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

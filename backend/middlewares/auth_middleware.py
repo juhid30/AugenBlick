@@ -16,9 +16,11 @@ def token_required(f):
         # Remove "Bearer " from the token string
         if token.startswith('Bearer '):
             token = token[7:]
+
         
         try:
             # Decode the token with the app's SECRET_KEY
+            print(token)
             decoded = jwt.decode(token, app.config['SECRET_KEY'])
             print(f"Decoded token: {decoded}")
 
