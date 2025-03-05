@@ -36,8 +36,11 @@ class Attendance:
         return attendance
 
     @staticmethod
+    @staticmethod
     def update_attendance(user_email, date, status=None, check_in_time=None, check_out_time=None, work_hours=None):
         """ Update attendance record """
+        
+        # Build update fields dynamically
         update_fields = {}
         if status is not None:
             update_fields["status"] = status
@@ -48,8 +51,23 @@ class Attendance:
         if work_hours is not None:
             update_fields["work_hours"] = work_hours
 
-        response = mongo.db.attendance.update_one({"user_email": user_email, "date": date}, {"$set": update_fields})
-        return response
+        # Ensure we are updating something
+        if not update_fields:
+            return {"error": "No fields to update", "modified_count": 0}
+
+        # Perform update
+        response = mongo.db.attendance.update_one(
+            {"user_email": user_email, "date": date},
+            {"$set": update_fields}
+        )
+
+        # Return detailed response
+        return {
+            "matched_count": response.matched_count,
+            "modified_count": response.modified_count,
+            "message": "Update successful" if response.modified_count > 0 else "No changes made"
+        }
+
 
     @staticmethod
     def delete_attendance(user_email, date):

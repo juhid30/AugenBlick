@@ -57,8 +57,17 @@ def register():
 # Get latest attendance status
 def get_latest_attendance(user_email):
     try:
-        response = requests.get(ATTENDANCE_API_URL, json={"email": user_email})
-        
+        token = request.headers.get("Authorization")
+        if not token:
+            return {"error": "Unauthorized, token missing"}, 401
+
+        headers = {
+            "Authorization": token,  # Pass token in request
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(ATTENDANCE_API_URL, json={"email": user_email}, headers=headers)
+
         if response.status_code == 200:
             attendance_records = response.json()
             today = datetime.now().strftime("%d-%m-%Y")
@@ -106,7 +115,7 @@ def mark_attendance():
                     print(f"Detected: {name}, Email: {email}, Elapsed Time: {elapsed_time} seconds")
                     
                     # Only proceed if elapsed time is >= 2 seconds
-                    if elapsed_time >= 2:
+                    if elapsed_time >= 10:
                         if email:  # Ensure email exists before proceeding
                             latest_attendance = get_latest_attendance(email)  # Use email for attendance
                             if latest_attendance:
@@ -115,16 +124,27 @@ def mark_attendance():
                                 print(f"No attendance record found for {email}.")
                         
                         # Check if attendance needs to be marked or checked out
-                        if latest_attendance and latest_attendance["status"] == "checked-in":
-                            checkout_face(email)  # If already checked in, call checkout with email
+                        if latest_attendance:
+                                print(f"Latest Attendance Status: {latest_attendance}")
+                                status = latest_attendance.get("status", "")
+
+                                if status == "checked-in":
+                                    print(f"🔵 {name} is already checked in. Checking out now.")
+                                    checkout_face(email)  # Call checkout function
+                                elif status == "checked-out":
+                                    print(f"🟢 {name} is checked out. Checking in now.")
+                                    checkin_face(email)  # Call check-in function
+                                else:
+                                    print(f"⚠️ Unknown status for {name}, defaulting to check-in.")
+                                    checkin_face(email)  # Default to check-in if status is unclear
                         else:
-                            checkin_face(email)  # Otherwise, call check-in with email
+                            print(f"No attendance record found for {email}. Checking in.")
+                            checkin_face(email)  # If no record found, check-in
 
                         print(f"✅ {name} marked present")  # Print in terminal
                         del detected_faces[name]  # Reset timer for the person
                 else:
                     detected_faces[name] = datetime.now()  # Start timer
-                    # checkin_face(email)  # Calls the check-in function with email
 
             # Draw Bounding Box
             top, right, bottom, left = [v * 4 for v in faceLoc]
