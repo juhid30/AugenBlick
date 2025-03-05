@@ -19,4 +19,10 @@ def get_leave_details(user):
     except Exception as e:
         raise Exception(str(e))
     
-    
+def get_user_by_email(email):
+    """Fetch user details by email"""
+    try:
+        user = User.get_user_by_email(email)
+        return user
+    except Exception as e:
+        raise Exception(str(e))

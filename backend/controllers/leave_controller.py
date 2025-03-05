@@ -14,7 +14,7 @@ def add_leave(user):
         if not data:
             return jsonify({"error": "Invalid input"}), 400
 
-        user_id = user['user_id']
+        user_email = user['email']
         leave_type = data.get('leave_type')
         reason = data.get('reason')
         start_date = data.get('start_date')
@@ -25,7 +25,7 @@ def add_leave(user):
         if not all([leave_type, reason, start_date, end_date]):
             return jsonify({"error": "Missing required fields"}), 400
 
-        leave_response = Leave.add_leave_by_user(user_id, leave_type, reason, start_date, end_date, pdf_uploaded)
+        leave_response = Leave.add_leave_by_user(user_email, leave_type, reason, start_date, end_date, pdf_uploaded, manager_id)
 
         if leave_response:
             return jsonify({"message": "Leave added successfully", "leave_info": leave_response}), 201

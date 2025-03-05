@@ -10,6 +10,7 @@ load_dotenv()
 
 """Create and configure the Flask app."""
 app = Flask(__name__)
+CORS(app, origins="http://localhost:5173", supports_credentials=True)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -27,6 +28,7 @@ mongo.init_app(app)
 CORS(app, resources={r"/*": {"origins": os.getenv("CORS_ORIGIN", "*")}})
 
 # Import routes AFTER app is created
+
 from routes.routes import initialize_routes
 initialize_routes(app)
 

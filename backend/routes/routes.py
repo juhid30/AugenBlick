@@ -56,6 +56,11 @@ def initialize_routes(app):
     @app.route('/login', methods=['POST'])
     def login_route():
         return login()
+    
+    @app.route('/get-user', methods=['GET'])
+    @token_required
+    def get_user():
+        return get_user_by_email(request.user['email'])
 
 # LEAVE MANAGEMENT ROUTES
     @app.route('/add-leave', methods=['POST'])
