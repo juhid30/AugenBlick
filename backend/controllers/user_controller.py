@@ -6,6 +6,7 @@ def get_attendance_details(user):
     """Fetch attendance details for the user"""
     try:
         attendance_details = Attendance.get_attendance_by_user(user['email'])
+        print(attendance_details)
         return attendance_details
     except Exception as e:
         raise Exception(str(e))

@@ -1,11 +1,15 @@
 from flask import jsonify, request
 
+
 def initialize_routes(app):
     from controllers.auth_controller import register, login  # Import register and login functions
     from controllers.leave_controller import add_leave, approve_leave, reject_leave  # Import add_leave function
     from controllers.attendance_controller import check_in, check_out  # Import check_in function
     from middlewares.auth_middleware import token_required 
     from controllers.user_controller import get_attendance_details, get_leave_details
+    from face_recog import face_recog_bp
+
+    app.register_blueprint(face_recog_bp, url_prefix='/face-recog')  # Face recognition routes
 
     # print("HI")
 
@@ -22,8 +26,7 @@ def initialize_routes(app):
     def login_route():
         return login()
 
-
-
+# LEAVE MANAGEMENT ROUTES
     @app.route('/add-leave', methods=['POST'])
     @token_required
     def add_leave_route():
@@ -38,7 +41,8 @@ def initialize_routes(app):
     @token_required 
     def reject_leave_route():
         return reject_leave(request.user)
-    
+
+    # ATTENDANCE MANAGEMENT ROUTES
     @app.route('/check-in', methods=['POST'])
     def check_in_route():
         return check_in() 
@@ -46,7 +50,7 @@ def initialize_routes(app):
     @app.route('/check-out', methods=['POST'])
     def check_out_route():
         return check_out()   
-    
+
     @app.route('/get-attendance', methods=['GET'])
     @token_required
     def get_attendance_route():
@@ -57,6 +61,7 @@ def initialize_routes(app):
     def get_leave_route():
         return get_leave_details(request.user)
     
+
 
     @app.route('/protected', methods=['GET'])
     @token_required

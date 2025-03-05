@@ -7,6 +7,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,16 +22,46 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate authentication process
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      // console.log("HEllo");
+      const data = await response.json();
+      // console.log(data);
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid credentials");
+      }
+
+      // Save token and role in localStorage
+      // localStorage.setItem("token", data.access_token);
+      localStorage.setItem("role", data.role);
+
+      // Redirect based on role
+      if (data.role === "user") {
+        window.location.href = "/emp-dash";
+      } else if (data.role === "manager") {
+        window.location.href = "/man-dash";
+      } else {
+        throw new Error("Invalid role received");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-      // In a real app, you would redirect to dashboard or show error
-      console.log("Login attempted with:", formData);
-    }, 1500);
+    }
   };
 
   return (
@@ -149,7 +180,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-colors ${
+              className={`w-full flex items-center justify-center px-6 py-3 rounded-lg text-black font-medium transition-colors ${
                 isLoading
                   ? "bg-primary-400 cursor-not-allowed"
                   : "bg-primary-600 hover:bg-primary-700"
@@ -157,7 +188,7 @@ const LoginPage = () => {
             >
               {isLoading ? (
                 <div className="flex items-center">
-                  <LoadingSpinner size="small" color="text-white" />
+                  <LoadingSpinner size="small" color="text-black" />
                   <span className="ml-2">Signing in...</span>
                 </div>
               ) : (
@@ -183,7 +214,7 @@ const LoginPage = () => {
           <img
             src="https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
             alt="Office workspace"
-            className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
+            className="absolute inset-0 w-full h-full object-cover mix-blend-normal"
           />
 
           <div className="relative h-full flex flex-col justify-center p-12 text-white">
