@@ -151,10 +151,7 @@ const initialLeaves = [
 ];
 
 const LeaveReviewPage = () => {
-  const [leaves, setLeaves] = useState(() => {
-    const savedLeaves = localStorage.getItem("leaves");
-    return savedLeaves ? JSON.parse(savedLeaves) : initialLeaves;
-  });
+  const [leaves, setLeaves] = useState([]);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [dateFilter, setDateFilter] = useState({
     startDate: null,
@@ -163,10 +160,44 @@ const LeaveReviewPage = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("leaves", JSON.stringify(leaves));
-  }, [leaves]);
+    fetchLeaves();
+  }, []);
+
+  const fetchLeaves = async () => {
+    setIsRefreshing(true);
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token"); // Get token from localStorage
+
+      const response = await fetch("/get-manager-leaves", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ Add Authorization header
+        },
+        // credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch leaves");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setLeaves(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsRefreshing(false);
+      setLoading(false);
+    }
+  };
 
   const updateLeaveStatus = (leaveId, status, remarks) => {
     setLeaves((prevLeaves) =>
