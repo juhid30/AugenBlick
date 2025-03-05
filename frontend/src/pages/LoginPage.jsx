@@ -6,6 +6,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -21,18 +22,63 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate authentication process
-    setTimeout(() => {
+    setError(null);
+  
+    try {
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid credentials");
+      }
+  
+      // Save token and role in localStorage
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("role", data.role);
+  
+      // Fetch user data using the access token
+      const userResponse = await fetch("http://127.0.0.1:5000/get-user", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${data.access_token}`, // Add the access token in the header
+        },
+      });
+  
+      if (!userResponse.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+  
+      const userData = await userResponse.json();
+      localStorage.setItem("user", JSON.stringify(userData)); // Save the user data to localStorage
+  
+      // Redirect based on role
+      if (data.role === "user") {
+        window.location.href = "/user-dashboard";
+      } else if (data.role === "manager") {
+        window.location.href = "/manager-dashboard";
+      } else {
+        throw new Error("Invalid role received");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-      // In a real app, you would redirect to dashboard or show error
-      console.log("Login attempted with:", formData);
-    }, 1500);
+    }
   };
-
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}

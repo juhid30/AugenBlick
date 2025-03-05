@@ -8,7 +8,9 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import LeavePage from "./pages/LeavePage";
 import LeaveReviewPage from "./pages/LeaveReviewPage";
 import UserDashboard from "./pages/UserDashboard";
-import Layout from "./components/UserDashboard/Layout";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import UserLayout from "./components/UserDashboard/UserLayout";
+import ManagerLayout from "./components/ManagerDashboard/ManagerLayout";
 
 function App() {
   return (
@@ -20,8 +22,23 @@ function App() {
           <Route path="/att" element={<AttendancePage />} />
           <Route path="/leave" element={<LeavePage />} />
           <Route path="/rev" element={<LeaveReviewPage />} />
-          <Route path="/user-dashboard" element={<Layout><UserDashboard/></Layout>} />
-          {/* <Route path="/unauth" element={<UnauthorizedPage />} /> */}
+          <Route 
+            path="/user-dashboard" 
+            element={
+              <UserLayout>
+                <UserDashboard />
+              </UserLayout>
+            } 
+          />
+          <Route 
+            path="/manager-dashboard" 
+            element={
+              <ManagerLayout>
+                <ManagerDashboard />
+              </ManagerLayout>
+            } 
+          />
+          <Route path="/unauth" element={<UnauthorizedPage />} />
         </Routes>
       </AnimatePresence>
     </Router>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { Link } from 'react-router-dom'
@@ -17,19 +17,20 @@ import AttendanceList from '../components/UserDashboard/AttendanceList'
 import AttendanceSummary from '../components/UserDashboard/AttendanceSummary'
 import LeaveList from '../components/UserDashboard/LeaveList'
 
-// Mock data
+const localUser = JSON.parse(localStorage.getItem('user'))
 const user = {
-  name: "Alex Johnson",
+  name: localUser.fullname,
   position: "Senior Developer",
-  department: "Engineering",
-  email: "alex.johnson@company.com",
+  department: localUser.team,
+  email: localUser.email,
   location: "San Francisco, CA",
-  avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+  avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+  id: localUser._id
 }
 
-const attendanceData = [
+const attendanceDataa = [
   { 
-    date: "2023-05-01", 
+    date: "2025-05-01", 
     status: "present", 
     check_in_time: "09:00 AM", 
     check_out_time: "05:30 PM", 
@@ -37,7 +38,7 @@ const attendanceData = [
     overtime: 1.5
   },
   { 
-    date: "2023-05-02", 
+    date: "2025-05-02", 
     status: "late", 
     check_in_time: "10:15 AM", 
     check_out_time: "06:45 PM", 
@@ -45,7 +46,7 @@ const attendanceData = [
     overtime: 1.5
   },
   { 
-    date: "2023-05-03", 
+    date: "2025-05-03", 
     status: "absent", 
     check_in_time: "-", 
     check_out_time: "-", 
@@ -53,7 +54,7 @@ const attendanceData = [
     overtime: 0
   },
   { 
-    date: "2023-05-04", 
+    date: "2025-05-04", 
     status: "present", 
     check_in_time: "08:45 AM", 
     check_out_time: "05:00 PM", 
@@ -61,7 +62,7 @@ const attendanceData = [
     overtime: 1.25
   },
   { 
-    date: "2023-05-05", 
+    date: "2025-05-05", 
     status: "present", 
     check_in_time: "09:00 AM", 
     check_out_time: "04:30 PM", 
@@ -70,13 +71,13 @@ const attendanceData = [
   }
 ];
 
-const leaveData = [
+const leaveDataa = [
   {
     id: 1,
     leave_type: "Sick Leave",
     reason: "Fever and cold",
-    start_date: "2023-04-10",
-    end_date: "2023-04-12",
+    start_date: "2025-04-10",
+    end_date: "2025-04-12",
     status: "approved",
     pdf_link: "https://example.com/leave-docs/sick-leave-1.pdf"
   },
@@ -84,8 +85,8 @@ const leaveData = [
     id: 2,
     leave_type: "Vacation",
     reason: "Family trip",
-    start_date: "2023-06-15",
-    end_date: "2023-06-22",
+    start_date: "2025-06-15",
+    end_date: "2025-06-22",
     status: "pending",
     pdf_link: "https://example.com/leave-docs/vacation-1.pdf"
   },
@@ -93,18 +94,110 @@ const leaveData = [
     id: 3,
     leave_type: "Personal Leave",
     reason: "Personal matters",
-    start_date: "2023-03-05",
-    end_date: "2023-03-05",
+    start_date: "2025-03-05",
+    end_date: "2025-03-05",
     status: "approved",
     pdf_link: "https://example.com/leave-docs/personal-1.pdf"
   }
 ];
+const token = localStorage.getItem("token"); // Get token from localStorage
 
-const Dashboard = () => {
+const UserDashboard = () => {
   const [activeView, setActiveView] = useState('attendance') // 'attendance' or 'leave'
 
+  const [leaveData, setLeaveData] = useState(leaveDataa);
+  const [attendanceData, setAttendanceData] = useState(attendanceDataa);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Function to fetch leave data
+  const getLeaves = async () => {
+    const token = localStorage.getItem("token"); // Get token from localStorage
+
+    if (!token) {
+      console.error("No token found in localStorage");
+      throw new Error("No token found in localStorage");
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/get-leaves", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`, // Pass the token as Bearer
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch leave data");
+      }
+
+      // Append new data to leaveData array
+      setLeaveData(prevLeaveData => [...prevLeaveData, ...data]);
+
+    } catch (err) {
+      console.error("Error fetching leave data:", err.message);
+      throw err; // Rethrow the error to be caught by useEffect's try-catch
+    }
+  };
+
+  // Function to fetch attendance data
+  const getAttendance = async () => {
+    const token = localStorage.getItem("token"); // Get token from localStorage
+
+    if (!token) {
+      console.error("No token found in localStorage");
+      throw new Error("No token found in localStorage");
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/get-attendance", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`, // Pass the token as Bearer
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch attendance data");
+      }
+
+      // Append new data to attendanceData array
+      setAttendanceData(prevAttendanceData => [...prevAttendanceData, ...data]);
+
+    } catch (err) {
+      console.error("Error fetching attendance data:", err.message);
+      throw err; // Rethrow the error to be caught by useEffect's try-catch
+    }
+  };
+
+  // useEffect to load the data when the page is rendered
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true); // Set loading state to true while fetching data
+        setError(null); // Reset any previous errors
+
+        // Call both functions concurrently
+        await Promise.all([getLeaves(), getAttendance()]);
+
+      } catch (err) {
+        // Handle any error from either of the functions
+        setError("An error occurred while fetching data: " + err.message);
+      } finally {
+        setIsLoading(false); // Set loading state to false when done
+      }
+    };
+
+    fetchData(); // Call the fetchData function when the component is mounted
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       {/* Header Section */}
       <div className="bg-white shadow-sm border-b border-gray-200 mb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -210,7 +303,7 @@ const Dashboard = () => {
                 </div>
                 <div className="px-4 py-2 bg-indigo-50 rounded-lg">
                   <p className="text-sm text-indigo-600 font-medium">Employee ID</p>
-                  <p className="text-indigo-700 font-semibold">EMP10234</p>
+                  <p className="text-indigo-700 font-semibold">{user.id}</p>
                 </div>
               </div>
             </div>
@@ -246,4 +339,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default UserDashboard

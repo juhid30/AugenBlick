@@ -164,7 +164,7 @@ const AttendanceList = ({ attendanceData }) => {
                 className="hover:bg-gray-50"
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {format(parseISO(item.date), 'MMM dd, yyyy')}
+                  {format((item.date), 'MMM dd, yyyy')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass(item.status)}`}>

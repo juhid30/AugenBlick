@@ -6,10 +6,10 @@ def initialize_routes(app):
     from controllers.leave_controller import add_leave, approve_leave, reject_leave  # Import add_leave function
     from controllers.attendance_controller import check_in, check_out  # Import check_in function
     from middlewares.auth_middleware import token_required 
-    from controllers.user_controller import get_attendance_details, get_leave_details
-    from face_recog import face_recog_bp
+    from controllers.user_controller import get_attendance_details, get_leave_details, get_user_by_email
+    # from face_recog import face_recog_bp
 
-    app.register_blueprint(face_recog_bp, url_prefix='/face-recog')  # Face recognition routes
+    # app.register_blueprint(face_recog_bp, url_prefix='/face-recog')  # Face recognition routes
 
     # print("HI")
 
@@ -25,6 +25,11 @@ def initialize_routes(app):
     @app.route('/login', methods=['POST'])
     def login_route():
         return login()
+    
+    @app.route('/get-user', methods=['GET'])
+    @token_required
+    def get_user():
+        return get_user_by_email(request.user['email'])
 
 # LEAVE MANAGEMENT ROUTES
     @app.route('/add-leave', methods=['POST'])
