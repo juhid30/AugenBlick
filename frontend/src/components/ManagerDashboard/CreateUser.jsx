@@ -3,21 +3,58 @@ import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiLock, FiUsers, FiUserPlus } from 'react-icons/fi';
 
 const CreateUser = () => {
+
+  const localUser = JSON.parse(localStorage.getItem('user'));
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
     role: 'user',
     team: '',
-    manager_id: '67c75329abd06a37fe465bc9'
+    manager_id: localUser._id
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+  
+    try {
+      // Set loading state if you want to manage UI during submission (optional)
+      setIsLoading(true); 
+  
+      // Send POST request to the /register endpoint with the form data
+      const response = await fetch("http://127.0.0.1:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Set the request content type to JSON
+        },
+        body: JSON.stringify(formData), // Pass the form data as JSON
+      });
+  
+      // Parse the response from the API
+      const data = await response.json();
+  
+      if (!response.ok) {
+        // If response is not OK, throw an error with message from response
+        throw new Error(data.message || "Failed to register user");
+      }
+  
+      // If registration is successful, log success (you could also redirect or show a success message)
+      console.log("User successfully registered:", data);
+  
+      // Optional: You can reset the form or navigate to another page
+      // Example: setFormData({...}) to reset form or redirect after success
+  
+    } catch (err) {
+      console.error("Error during registration:", err.message);
+      setError(err.message); // Optionally, show error in the UI
+    } finally {
+      setIsLoading(false); // Set loading to false once the request completes
+    }
   };
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
