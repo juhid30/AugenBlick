@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, isValid } from 'date-fns'
 import { motion } from 'framer-motion'
 import { 
   FiFileText, 
@@ -15,6 +15,20 @@ import {
 
 const LeaveList = ({ leaveData }) => {
   const [selectedLeave, setSelectedLeave] = useState(null);
+
+  // Add this helper function for safe date formatting
+  const formatDate = (dateString) => {
+    try {
+      const date = parseISO(dateString);
+      if (!isValid(date)) {
+        return 'Invalid date';
+      }
+      return format(date, 'MMM dd, yyyy');
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid date';
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -142,7 +156,7 @@ const LeaveList = ({ leaveData }) => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-900">{leave.leave_type}</h4>
                         <p className="text-xs text-gray-500 mt-1">
-                          {format(parseISO(leave.start_date), 'MMM dd')} - {format(parseISO(leave.end_date), 'MMM dd, yyyy')}
+                          {formatDate(leave.start_date)} - {formatDate(leave.end_date)}
                         </p>
                       </div>
                     </div>
@@ -157,7 +171,7 @@ const LeaveList = ({ leaveData }) => {
                   <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center">
                       <FiCalendar className="h-4 w-4 mr-1" />
-                      Applied on {format(parseISO(leave.start_date), 'MMM dd, yyyy')}
+                      Applied on {formatDate(leave.start_date)}
                     </div>
                     <button className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
                       <FiDownload className="h-4 w-4 mr-1" />
@@ -193,13 +207,13 @@ const LeaveList = ({ leaveData }) => {
                         <div>
                           <p className="text-sm text-gray-500">Start Date</p>
                           <p className="text-base font-medium text-gray-900">
-                            {format(parseISO(selectedLeave.start_date), 'MMM dd, yyyy')}
+                            {formatDate(selectedLeave.start_date)}
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">End Date</p>
                           <p className="text-base font-medium text-gray-900">
-                            {format(parseISO(selectedLeave.end_date), 'MMM dd, yyyy')}
+                            {formatDate(selectedLeave.end_date)}
                           </p>
                         </div>
                       </div>
@@ -257,4 +271,4 @@ const LeaveList = ({ leaveData }) => {
 }
 
 export default LeaveList
-  
+

@@ -3,24 +3,87 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { FiClock, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
 
-const mockAttendanceData = [
+const initialAttendanceData = [
   {
     id: 1,
-    employeeName: 'John Doe',
+    employeeName: 'Amit Sharma',
     date: '2024-02-15',
     checkIn: '09:00 AM',
     checkOut: '06:00 PM',
-    status: 'present'
+    status: 'checked-out'
   },
-  // Add more mock data as needed
+  {
+    id: 2,
+    employeeName: 'Juhi Deore',
+    date: '2024-02-15',
+    checkIn: '08:45 AM',
+    checkOut: '',
+    status: 'checked-in'
+  },
+  {
+    id: 3,
+    employeeName: 'Rajesh Verma',
+    date: '2024-02-15',
+    checkIn: '09:15 AM',
+    checkOut: '06:15 PM',
+    status: 'checked-out'
+  },
+  {
+    id: 4,
+    employeeName: 'Sneha Iyer',
+    date: '2024-02-14',
+    checkIn: '09:30 AM',
+    checkOut: '06:30 PM',
+    status: 'checked-out'
+  },
+  {
+    id: 5,
+    employeeName: 'Arjun Patil',
+    date: '2024-02-14',
+    checkIn: '08:30 AM',
+    checkOut: '05:45 PM',
+    status: 'checked-out'
+  },
+  {
+    id: 6,
+    employeeName: 'Pooja Nair',
+    date: '2024-02-14',
+    checkIn: '09:05 AM',
+    checkOut: '06:00 PM',
+    status: 'checked-out'
+  },
+  {
+    id: 7,
+    employeeName: 'Vikram Singh',
+    date: '2024-02-13',
+    checkIn: '08:55 AM',
+    checkOut: '05:55 PM',
+    status: 'checked-out'
+  },
+  {
+    id: 8,
+    employeeName: 'Jash Rashne',
+    date: '2024-02-13',
+    checkIn: '09:10 AM',
+    checkOut: '06:10 PM',
+    status: 'checked-out'
+  }
 ];
+
 
 const AttendanceView = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [attendanceData, setAttendanceData] = useState(initialAttendanceData);
 
-  const filteredAttendance = mockAttendanceData.filter(record => {
+  const getStatusColor = (status) => {
+    return status === 'checked-in' 
+      ? 'bg-blue-100 text-blue-800'
+      : 'bg-green-100 text-green-800';
+  };
+
+  const filteredAttendance = attendanceData.filter(record => {
     const matchesSearch = record.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDate = !filterDate || record.date === filterDate;
     const matchesStatus = filterStatus === 'all' || record.status === filterStatus;
@@ -105,14 +168,10 @@ const AttendanceView = () => {
                       <div className="text-sm text-gray-500">{record.checkIn}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{record.checkOut}</div>
+                      <div className="text-sm text-gray-500">{record.checkOut || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        record.status === 'present' ? 'bg-green-100 text-green-800' :
-                        record.status === 'absent' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(record.status)}`}>
                         {record.status}
                       </span>
                     </td>

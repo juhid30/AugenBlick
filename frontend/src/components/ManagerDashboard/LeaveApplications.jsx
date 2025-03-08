@@ -11,6 +11,49 @@ import {
   FiExternalLink
 } from 'react-icons/fi';
 
+const dummyLeaveData = [
+  {
+    _id: 1,
+    user_email: "juhi.deore@gmail.com",
+    leave_type: "Sick Leave",
+    start_date: "2024-02-15",
+    end_date: "2024-02-16",
+    status: "pending",
+    pdf_uploaded: "#",
+    reason: "Medical appointment"
+  },
+  {
+    _id: 2,
+    user_email: "jash.rashne@gmail.com",
+    leave_type: "Vacation",
+    start_date: "2024-02-20",
+    end_date: "2024-02-25",
+    status: "approved",
+    pdf_uploaded: "#",
+    reason: "Family vacation"
+  },
+  {
+    _id: 3,
+    user_email: "amita.doshi@example.com",
+    leave_type: "Personal Leave",
+    start_date: "2024-02-18",
+    end_date: "2024-02-19",
+    status: "rejected",
+    pdf_uploaded: "#",
+    reason: "Personal matters"
+  },
+  {
+    _id: 4,
+    user_email: "sarah.khan@example.com",
+    leave_type: "Sick Leave",
+    start_date: "2024-02-16",
+    end_date: "2024-02-17",
+    status: "pending",
+    pdf_uploaded: "#",
+    reason: "Not feeling well"
+  }
+];
+
 const RemarkModal = ({ onClose, onConfirm }) => {
   const [remarkText, setRemarkText] = useState('');
 
@@ -82,6 +125,8 @@ const LeaveApplications = () => {
         setLeaveData(data);
       } catch (error) {
         console.error("Error fetching leave data:", error);
+        // Use dummy data if API fails
+        setLeaveData(dummyLeaveData);
       }
     };
 
@@ -89,8 +134,13 @@ const LeaveApplications = () => {
   }, []);
 
   const handleApprove = (leave) => {
-    console.log("Approved leave:", leave);
-    // Add approval logic
+    setLeaveData(prevData => 
+      prevData.map(item => 
+        item._id === leave._id 
+          ? { ...item, status: 'approved' } 
+          : item
+      )
+    );
   };
 
   const handleReject = (leave) => {
@@ -99,8 +149,13 @@ const LeaveApplications = () => {
   };
 
   const handleRejectConfirm = (remark) => {
-    console.log("Rejected leave:", selectedLeave, "with remark:", remark);
-    // Add rejection logic
+    setLeaveData(prevData => 
+      prevData.map(item => 
+        item._id === selectedLeave._id 
+          ? { ...item, status: 'rejected', remark } 
+          : item
+      )
+    );
     setShowRemarkModal(false);
     setSelectedLeave(null);
   };
@@ -167,7 +222,13 @@ const LeaveApplications = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {leaveData.map((leave) => (
+                {leaveData
+                  .filter(leave => {
+                    const matchesSearch = leave.user_email.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesStatus = filterStatus === 'all' || leave.status === filterStatus;
+                    return matchesSearch && matchesStatus;
+                  })
+                  .map((leave) => (
                   <tr key={leave._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{leave.user_email}</div>

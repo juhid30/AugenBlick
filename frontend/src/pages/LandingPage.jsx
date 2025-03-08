@@ -36,7 +36,7 @@ const LandingPage = () => {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="mt-4 text-primary-600 font-medium"
           >
-            Loading MinG Baby HRMS...
+            Loading HRBrick HRMS...
           </motion.p>
         </motion.div>
       </div>

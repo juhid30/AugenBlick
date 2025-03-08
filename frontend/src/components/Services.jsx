@@ -109,7 +109,7 @@ const Services = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg text-gray-600"
           >
-            MinG Baby offers a suite of integrated HR services designed to
+            HRBrick offers a suite of integrated HR services designed to
             streamline your workforce management and enhance employee
             experience.
           </motion.p>

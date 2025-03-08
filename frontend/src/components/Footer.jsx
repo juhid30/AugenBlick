@@ -19,7 +19,7 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-2 mb-6">
               <Baby className="h-8 w-8 text-primary-400" />
               <span className="font-display font-bold text-xl text-white">
-                MinG Baby
+                HRBrick
               </span>
             </Link>
             <p className="text-gray-400 mb-6">
@@ -121,7 +121,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} MinG Baby. All rights reserved.
+              &copy; {new Date().getFullYear()} HRBrick. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-500 hover:text-gray-400 text-sm">

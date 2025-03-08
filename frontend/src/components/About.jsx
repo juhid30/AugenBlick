@@ -47,7 +47,7 @@ const About = () => {
             transition={{ duration: 0.5 }}
             className="inline-block px-4 py-1.5 mb-5 text-xs font-medium uppercase tracking-wider text-primary-700 bg-primary-100 rounded-full"
           >
-            About MinG Baby
+            About HRBrick
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ const About = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg text-gray-600"
           >
-            MinG Baby was founded with a mission to simplify human resource
+            HRBrick was founded with a mission to simplify human resource
             management for businesses of all sizes. Our innovative HRMS solution
             focuses on attendance tracking and leave management, helping
             organizations optimize their workforce and improve employee
@@ -119,7 +119,7 @@ const About = () => {
             transition={{ duration: 0.5 }}
           >
             <h3 className="text-2xl font-bold font-display text-gray-900 mb-6">
-              Why Choose MinG Baby HRMS?
+              Why Choose HRBrick HRMS?
             </h3>
             <div className="space-y-4">
               {[

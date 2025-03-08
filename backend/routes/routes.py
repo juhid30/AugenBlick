@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 
 def initialize_routes(app):
     from controllers.auth_controller import register, login  # Import register and login functions
-    from controllers.leave_controller import add_leave, approve_leave, reject_leave, get_leaves_for_manager  # Import add_leave function
+    from controllers.leave_controller import add_leave, approve_leave, reject_leave  # Import add_leave function
     from controllers.attendance_controller import check_in, check_out  # Import check_in function
     from middlewares.auth_middleware import token_required 
-    from controllers.user_controller import get_attendance_details, get_leave_details, get_user_by_email, get_user_by_manager, get_leaves_by_manager
+    from controllers.user_controller import get_attendance_details, get_leave_details, get_user_by_email, get_user_by_manager, get_leaves_by_manager, add_url, get_urls
     # from face_recog import face_recog_bp
     # from pdf_parser import pdf_parser_bp
     from app import cloudinary
@@ -107,14 +107,28 @@ def initialize_routes(app):
     @token_required
     def get_leave_route():
         return get_leave_details(request.user)
-    @app.route('/get-manager-leaves', methods=['GET'])
-    @token_required
-    def get_man_leaves_route():
-        print("Fetching manager leaves route triggered")
-        return get_leaves_for_manager(request.user)
+    
+    # @app.route('/get-manager-leaves', methods=['GET'])
+    # @token_required
+    # def get_man_leaves_route():
+    #     print("Fetching manager leaves route triggered")
+    #     return get_leaves_for_manager(request.user)
 
+    @app.route('/add-url', methods=['POST'])
+    def add_url_route():
+        try:
+            data = request.json
+            if not data or 'url' not in data:
+                return jsonify({"error": "URL is required"}), 400
+            
+            return add_url(data['url'])                
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
 
-
+    @app.route('/get-urls', methods=['GET'])
+    def get_urls_route():
+        return get_urls()
     @app.route('/protected', methods=['GET'])
     @token_required
     def protected_route():

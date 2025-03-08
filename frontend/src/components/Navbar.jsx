@@ -46,7 +46,7 @@ const Navbar = () => {
           <Link to="/" className="flex items-center space-x-2">
             <Baby className="h-8 w-8 text-primary-600" />
             <span className="font-display font-bold text-xl text-primary-800">
-              MinG Baby
+              HRBrick
             </span>
           </Link>
 
