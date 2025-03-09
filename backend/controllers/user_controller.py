@@ -45,3 +45,19 @@ def get_leaves_by_manager(user):
         return user
     except Exception as e:
         raise Exception(str(e))
+    
+def add_url(url):
+    """Add URL to user's profile"""
+    try:
+        result = User.add_url("test69@gmail.com" , url)
+        return result
+    except Exception as e:
+        raise Exception(f"Failed to add URL: {str(e)}")
+    
+def get_urls():
+    """Fetch all URLs"""
+    try:
+        urls = User.get_urls("test69@gmail.com")
+        return urls
+    except Exception as e:
+        raise Exception(str(e))

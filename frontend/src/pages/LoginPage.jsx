@@ -107,7 +107,7 @@ const LoginPage = () => {
           <div className="flex items-center mb-8">
             <Baby className="h-8 w-8 text-primary-600 mr-2" />
             <h1 className="font-display font-bold text-2xl text-gray-900">
-              MinG Baby HRMS
+              HRBrick HRMS
             </h1>
           </div>
 
@@ -241,7 +241,7 @@ const LoginPage = () => {
           <div className="relative h-full flex flex-col justify-center p-12 text-white">
             <div className="max-w-md">
               <h2 className="text-3xl font-bold font-display mb-6">
-                Streamline your HR operations with MinG Baby HRMS
+                Streamline your HR operations with HRBrick HRMS
               </h2>
               <p className="mb-8">
                 Our comprehensive HR management system helps you track

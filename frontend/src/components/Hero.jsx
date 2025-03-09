@@ -52,7 +52,7 @@ const Hero = () => {
               variants={itemVariants}
               className="text-lg text-gray-600 mb-8"
             >
-              MinG Baby's comprehensive HRMS solution streamlines attendance
+              HRBrick's comprehensive HRMS solution streamlines attendance
               tracking and leave management, helping you focus on what matters
               most - your people.
             </motion.p>

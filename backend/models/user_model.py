@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 from config import mongo  
 
 class User:
-    def __init__(self, user_id, fullname, email, password, manager_id, role, team):
+    def __init__(self, user_id, fullname, email, password, manager_id, role, team, urls):
         self.user_id = user_id
         self.fullname = fullname
         self.email = email
@@ -11,6 +11,7 @@ class User:
         self.team = team
         self.password = password
         self.manager_id = manager_id
+        self.urls = urls  # Fixed missing assignment
         self.collection = mongo.db.users
 
     @staticmethod
@@ -30,12 +31,10 @@ class User:
     @staticmethod
     def add_user(email, hashed_password, fullname, role, team, manager_id):
         """ Adds a new user to the database """
-        # Check if email already exists
         existing_user = mongo.db.users.find_one({"email": email})
         if existing_user:
             return {"error": "Email already exists."}
 
-        # Create a user document
         new_user = {
             "role": role,
             "team": team,
@@ -43,31 +42,56 @@ class User:
             "email": email,
             "password": hashed_password,
             "fullname": fullname,
+            "urls": [],  # Initialize with an empty array
             "created_at": datetime.utcnow()
         }
 
-        # Insert the new user into the MongoDB collection
         result = mongo.db.users.insert_one(new_user)
-
-        # Return user details (excluding password for security)
         user_data = new_user
         user_data["_id"] = str(result.inserted_id)
         return user_data
-    
+
+    @staticmethod
     def get_user_by_manager(manager_id):
         """ Fetch all users by manager_id """
         try:
-            # Fetch all users with the given manager_id and convert to a list
             users = list(mongo.db.users.find({"manager_id": manager_id}))
             return users
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
 
+    @staticmethod
     def get_leaves_by_manager(manager_id):
         """ Fetch all leaves by manager_id """
         try:
-            # Fetch all leaves with the given manager_id and convert to a list
             leaves = list(mongo.db.leaves.find({"manager_id": manager_id}))
             return leaves
         except Exception as e:
             raise Exception(f"An error occurred: {str(e)}")
+
+    @staticmethod
+    def add_url(email, url):
+        """ Append a URL to the user's urls array """
+        try:
+            result = mongo.db.users.update_one(
+                {"email": email},  
+                {"$push": {"urls": {"url": url, "timestamp": datetime.utcnow()}}}  
+            )
+            if result.modified_count > 0:
+                return {"success": True, "message": "URL added successfully."}
+            return {"success": False, "message": "User not found or URL not added."}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+
+
+    @staticmethod
+    def get_urls(email):
+        """ Fetch all URLs by email """
+        try:
+            user = mongo.db.users.find_one({"email": email})
+            if user:
+                return user.get("urls", [])
+            return []
+        except Exception as e:
+            raise Exception(str(e))

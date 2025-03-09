@@ -14,7 +14,7 @@ import {
 const dummyLeaveData = [
   {
     _id: 1,
-    user_email: "john.doe@example.com",
+    user_email: "juhi.deore@gmail.com",
     leave_type: "Sick Leave",
     start_date: "2024-02-15",
     end_date: "2024-02-16",
@@ -24,7 +24,7 @@ const dummyLeaveData = [
   },
   {
     _id: 2,
-    user_email: "jane.smith@example.com",
+    user_email: "jash.rashne@gmail.com",
     leave_type: "Vacation",
     start_date: "2024-02-20",
     end_date: "2024-02-25",
@@ -34,7 +34,7 @@ const dummyLeaveData = [
   },
   {
     _id: 3,
-    user_email: "mike.wilson@example.com",
+    user_email: "amita.doshi@example.com",
     leave_type: "Personal Leave",
     start_date: "2024-02-18",
     end_date: "2024-02-19",
@@ -44,7 +44,7 @@ const dummyLeaveData = [
   },
   {
     _id: 4,
-    user_email: "sarah.parker@example.com",
+    user_email: "sarah.khan@example.com",
     leave_type: "Sick Leave",
     start_date: "2024-02-16",
     end_date: "2024-02-17",
