@@ -25,7 +25,7 @@ cloudinary.config(
 # Initialize MongoDB
 mongo.init_app(app)
 
-CORS(app, resources={r"/*": {"origins": os.getenv("CORS_ORIGIN", "*")}})
+# CORS(app, resources={r"/*": {"origins": os.getenv("CORS_ORIGIN", "*")}})
 
 # Import routes AFTER app is created
 

@@ -129,14 +129,14 @@ const Hero = () => {
             </div>
 
             {/* Decorative elements */}
-            <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary-200 rounded-full opacity-50 blur-xl"></div>
+            <div className="absolute -top-10 -right-6 w-24 h-24 bg-secondary-200 rounded-full opacity-50 blur-xl"></div>
             <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-primary-200 rounded-full opacity-50 blur-xl"></div>
           </motion.div>
         </div>
       </div>
 
       {/* Wave decoration */}
-      <div className="absolute bottom-0 left-0 right-0">
+        <div className="absolute  -bottom-10 left-0 right-0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
           <path
             fill="#ffffff"

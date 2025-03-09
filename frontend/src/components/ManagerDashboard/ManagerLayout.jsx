@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiUsers, FiUserPlus, FiCalendar, FiClock, FiLogOut } from 'react-icons/fi';
 
 const ManagerLayout = ({ children }) => {
   const [activeTab, setActiveTab] = useState('teams');
+  const navigate = useNavigate();
 
   // Clone children and pass activeTab as prop
   const childrenWithProps = React.Children.map(children, child => {
@@ -57,8 +58,8 @@ const ManagerLayout = ({ children }) => {
               <div className="flex-shrink-0">
                 <button
                   onClick={() => {
-                    // Handle logout
-                    console.log('Logout clicked');
+                    localStorage.clear();
+                    navigate('/login');
                   }}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >

@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiCalendar, FiClock, FiLogOut } from 'react-icons/fi';
 
 const UserLayout = ({ children }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -20,8 +22,8 @@ const UserLayout = ({ children }) => {
               <div className="flex-shrink-0">
                 <button
                   onClick={() => {
-                    // Handle logout
-                    console.log('Logout clicked');
+                    localStorage.clear();
+                    navigate('/login');
                   }}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >

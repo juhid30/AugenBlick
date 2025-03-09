@@ -26,7 +26,7 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-  
+
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
@@ -38,47 +38,52 @@ const LoginPage = () => {
           password: formData.password,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
-        throw new Error(data.message || "Invalid credentials");
+        throw new Error(data.error || "Login failed");
       }
-  
-      // Save token and role in localStorage
+
+      // Store token
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("role", data.role);
-  
-      // Fetch user data using the access token
+
+      // Decode JWT to get user info (if needed)
+      const tokenPayload = JSON.parse(atob(data.access_token.split('.')[1]));
+      localStorage.setItem("user_role", tokenPayload.role);
+      localStorage.setItem("user_id", tokenPayload.user_id);
+      localStorage.setItem("user_email", tokenPayload.email);
+
+      // NEW: Fetch user details from /get-user API and save user information in localStorage
       const userResponse = await fetch("http://127.0.0.1:5000/get-user", {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${data.access_token}`, // Add the access token in the header
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${data.access_token}`
         },
       });
-  
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");
       }
-  
       const userData = await userResponse.json();
-      localStorage.setItem("user", JSON.stringify(userData)); // Save the user data to localStorage
-  
+      localStorage.setItem("user", JSON.stringify(userData));
+
       // Redirect based on role
-      if (data.role === "user") {
+      if (tokenPayload.role === "user") {
         window.location.href = "/user-dashboard";
-      } else if (data.role === "manager") {
+      } else if (tokenPayload.role === "manager") {
         window.location.href = "/manager-dashboard";
       } else {
-        throw new Error("Invalid role received");
+        throw new Error("Invalid role");
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -200,6 +205,7 @@ const LoginPage = () => {
                   ? "bg-primary-400 cursor-not-allowed"
                   : "bg-primary-600 hover:bg-primary-700"
               }`}
+              onClick={handleSubmit}
             >
               {isLoading ? (
                 <div className="flex items-center">

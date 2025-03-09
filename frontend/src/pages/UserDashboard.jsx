@@ -23,6 +23,13 @@ const leaveDataa = [
 
 const token = localStorage.getItem("token");
 
+function maskString(str) {
+  if (!str || str.length <= 8) {
+    return '*'.repeat(str ? str.length : 8); // If too short or undefined, mask everything
+  }
+  return str.slice(0, 4) + '*'.repeat(str.length - 8) + str.slice(-4);
+}
+
 const UserDashboard = () => {
   const [activeView, setActiveView] = useState("attendance"); // 'attendance' or 'leave'
   const [user, setUser] = useState(null);
@@ -98,7 +105,7 @@ const UserDashboard = () => {
         department: localUser?.team || "Development",
         email: localUser?.email || "john.doe@example.com",
         location: "San Francisco, CA",
-        avatar: localUser?.avatar || "https://randomuser.me/api/portraits/men/32.jpg",
+        avatar: localUser?.avatar || "https://firebasestorage.googleapis.com/v0/b/librarymanagementmpr.appspot.com/o/Screenshot%202025-03-05%20at%201.00.26%E2%80%AFPM.png?alt=media&token=f0b24fb4-44c5-4d9a-9b80-4d68959e0189",
         id: localUser?._id || "12345",
       });
 
@@ -216,7 +223,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="px-4 py-2 bg-indigo-50 rounded-lg">
                   <p className="text-sm text-indigo-600 font-medium">Employee ID</p>
-                  <p className="text-indigo-700 font-semibold">{user?.id || "12345"}</p>
+                  <p className="text-indigo-700 font-semibold">{maskString(user?.id) || maskString("67c80aa223ab541149f01d47")}</p>
                 </div>
               </div>
             </div>
